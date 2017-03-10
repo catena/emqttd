@@ -624,6 +624,15 @@ end}.
   {datatype, {enum, [true, false]}}
 ]}.
 
+{mapping, "mqtt.listener.ssl.crl_check", "emqttd.listeners", [
+  {datatype, {enum, [true, false, peer, best_effort]}}
+]}.
+
+{mapping, "mqtt.listener.ssl.crl_fetch_timeout", "emqttd.listeners", [
+  {default, 5000},
+  {datatype, integer}
+]}.
+
 {mapping, "mqtt.listener.http", "emqttd.listeners", [
   %% {default, 8083},
   {datatype, [integer, ip]}
@@ -679,6 +688,15 @@ end}.
   {datatype, {enum, [true, false]}}
 ]}.
 
+{mapping, "mqtt.listener.https.crl_check", "emqttd.listeners", [
+  {datatype, {enum, [true, false, peer, best_effort]}}
+]}.
+
+{mapping, "mqtt.listener.https.crl_fetch_timeout", "emqttd.listeners", [
+  {default, 5000},
+  {datatype, integer}
+]}.
+
 {translation, "emqttd.listeners", fun(Conf) ->
     Filter  = fun(Opts) -> [{K, V} || {K, V} <- Opts, V =/= undefined] end,
     LisOpts = fun(Prefix) ->
@@ -707,7 +725,9 @@ end}.
                           {certfile,   cuttlefish:conf_get(Prefix ++ ".certfile", Conf, undefined)},
                           {cacertfile, cuttlefish:conf_get(Prefix ++ ".cacertfile", Conf, undefined)},
                           {verify,     cuttlefish:conf_get(Prefix ++ ".verify", Conf, undefined)},
-                          {fail_if_no_peer_cert, cuttlefish:conf_get(Prefix ++ ".fail_if_no_peer_cert", Conf, undefined)}])
+                          {fail_if_no_peer_cert, cuttlefish:conf_get(Prefix ++ ".fail_if_no_peer_cert", Conf, undefined)},
+                          {crl_check, cuttlefish:conf_get(Prefix ++ ".crl_check", Conf, undefined)},
+                          {crl_cache, {ssl_crl_cache, {internal, [{http, cuttlefish:conf_get(Prefix ++ ".crl_fetch_timeout", Conf)}]}}}])
               end,
 
     Listeners = fun(Name) when is_atom(Name) ->
